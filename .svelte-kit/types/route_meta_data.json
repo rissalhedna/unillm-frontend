@@ -1,0 +1,12 @@
+{
+	"/": [],
+	"/api/chats": [
+		"src/routes/api/chats/+server.ts"
+	],
+	"/api/chats/[id]": [
+		"src/routes/api/chats/[id]/+server.ts"
+	],
+	"/api/chats/[id]/messages": [
+		"src/routes/api/chats/[id]/messages/+server.ts"
+	]
+}

@@ -1,0 +1,97 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Docker
+.docker
+*Dockerfile*
+*docker-compose*
+.dockerignore
+
+# Dependencies
+**/node_modules
+**/venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+pip-log.txt
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Development files
+.idea
+.vscode
+*.sublime-workspace
+*.sublime-project
+.editorconfig
+
+# Testing
+**/coverage
+**/.pytest_cache
+**/.coverage
+**/htmlcov
+**/test
+**/tests
+**/*.test.js
+**/*.spec.js
+
+# Build outputs
+# Uncomment the following lines if you need to include build outputs
+# **/dist
+# **/build
+# **/.next
+# **/.nuxt
+# **/out
+
+# Logs
+**/logs
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+*.md
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Svelte/Frontend specific
+**/node_modules
+**/.svelte-kit
+**/build
+**/.vercel
+**/.output
+**/.cloudflare
+**/.netlify
+**/.turbo
+**/.vite
+.svelte-kit
+.vercel
+.output
+.cloudflare
+.netlify
+.turbo
+.vite
+
+# Frontend build caches
+**/.cache
+.cache
+# Include lock files for consistent dependency management
+# **/yarn.lock
+# **/pnpm-lock.yaml
