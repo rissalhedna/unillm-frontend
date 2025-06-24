@@ -4,18 +4,16 @@
   import { onMount } from "svelte";
   import { SOURCE_DELIMITER } from "$lib/constants";
 
-  enum ChatCompletionRequestMessageRoleEnum {
-    user = "user",
-    assistant = "assistant",
-    system = "system",
-  }
+  type MessageRole = "user" | "assistant" | "system";
 
-  export let type: ChatCompletionRequestMessageRoleEnum;
+  export let type: MessageRole | string;
   export let message: string = "";
   export { classes as class };
 
   let classes = "";
   let scrollToDiv: HTMLDivElement;
+
+  $: normalizedType = (["user", "assistant", "system"].includes(type as string) ? type : "user") as MessageRole;
 
   const classSet = {
     user: "justify-end",
@@ -74,10 +72,10 @@
   $: formattedMessage = formatMessageWithSources(message);
 </script>
 
-<div class="flex {classSet[type]}">
+<div class="flex {classSet[normalizedType]}">
   <div
     use:typeEffect={message}
-    class="max-w-[100%] rounded-lg px-4 py-3 min-h-[2rem] break-words {classes} {messageClasses[type]}"
+    class="max-w-[100%] rounded-lg px-4 py-3 min-h-[2rem] break-words {classes} {messageClasses[normalizedType]}"
   >
       <div class="prose prose-sm dark:prose-invert max-w-none
                   prose-headings:mb-2 prose-headings:mt-4 first:prose-headings:mt-0

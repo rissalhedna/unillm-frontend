@@ -1,11 +1,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import type { ChatCompletionRequestMessage } from '$lib/types';
+import prisma from '$lib/server/db';
 
 export const POST: RequestHandler = async ({ params, request }) => {
-    const { messages } = await request.json();
+    const { messages }: { messages: ChatCompletionRequestMessage[] } = await request.json();
     console.log('📝 Updating messages for chat:', {
         chatId: params.id,
         messageCount: messages.length
@@ -22,7 +21,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
             where: { id: params.id },
             data: {
                 messages: {
-                    create: messages.map(({ role, content }) => ({
+                    create: messages.map(({ role, content }: ChatCompletionRequestMessage) => ({
                         role,
                         content
                     }))

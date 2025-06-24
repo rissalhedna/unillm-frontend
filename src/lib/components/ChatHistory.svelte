@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Ellipsis from "lucide-svelte/icons/ellipsis";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-  import { Button } from "$lib/components/ui/button";
   import { chatMessages } from "$lib/stores/chat-messages";
   import {
     chatHistorySubscription,
@@ -27,6 +25,7 @@
   let editingChatId: string | null = null;
   let newTitle = "";
   let isLoading = false;
+  let openDropdownId: string | null = null;
 
   onMount(async () => {
     await fetchChats();
@@ -50,12 +49,14 @@
       chatMessages.reset();
       activeChat.set(null);
     }
+    openDropdownId = null;
   }
 
   function startEditing(chat: Chat, event: Event) {
     event.stopPropagation();
     editingChatId = chat.id;
     newTitle = chat.title;
+    openDropdownId = null;
   }
 
   async function handleRename(chatId: string) {
@@ -69,7 +70,18 @@
     chatMessages.reset();
     activeChat.set(null);
   }
+
+  function toggleDropdown(chatId: string, event: Event) {
+    event.stopPropagation();
+    openDropdownId = openDropdownId === chatId ? null : chatId;
+  }
+
+  function closeDropdown() {
+    openDropdownId = null;
+  }
 </script>
+
+<svelte:window on:click={closeDropdown} />
 
 <div class="flex flex-col h-full overflow-y-scroll">
   <div class="flex-none p-2">
@@ -116,45 +128,50 @@
             </div>
           {/if}
 
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild let:builder>
-              <Button
-                variant="ghost"
-                builders={[builder]}
-                size="icon"
-                class="h-8 w-8 p-0 opacity-0 group-hover:opacity-100
-                       transition-opacity hover:bg-[#dd1c1a]/5
-                       dark:hover:bg-[#dd1c1a]/10"
-                on:click={(e) => e.stopPropagation()}
-              >
-                <span class="sr-only">Open menu</span>
-                <Ellipsis class="h-4 w-4" />
-              </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content align="end">
-              <DropdownMenu.Item
-                on:click={(e) => startEditing(chat, e)}
-                class="hover:bg-[#dd1c1a]/5 dark:hover:bg-[#dd1c1a]/10"
-              >
-                <Pencil class="h-4 w-4 mr-2" />
-                Rename
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                class="hover:bg-[#dd1c1a]/5 dark:hover:bg-[#dd1c1a]/10"
-              >
-                <Share class="h-4 w-4 mr-2" />
-                Share
-              </DropdownMenu.Item>
-              <DropdownMenu.Separator />
-              <DropdownMenu.Item
-                class="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20"
-                on:click={(e) => handleDelete(chat.id, e)}
-              >
-                <Trash2 class="h-4 w-4 mr-2" />
-                Delete
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
+          <div class="relative">
+            <button
+              class="h-8 w-8 p-0 opacity-0 group-hover:opacity-100
+                     transition-opacity hover:bg-[#dd1c1a]/5
+                     dark:hover:bg-[#dd1c1a]/10 rounded-md
+                     flex items-center justify-center"
+              on:click={(e) => toggleDropdown(chat.id, e)}
+            >
+              <span class="sr-only">Open menu</span>
+              <Ellipsis class="h-4 w-4" />
+            </button>
+            
+            {#if openDropdownId === chat.id}
+              <div class="absolute right-0 top-8 z-10 w-48 rounded-md bg-white dark:bg-gray-800 
+                         border border-gray-200 dark:border-gray-700 shadow-lg py-1">
+                <button
+                  on:click={(e) => startEditing(chat, e)}
+                  class="w-full px-3 py-2 text-sm text-left flex items-center gap-2
+                         hover:bg-[#dd1c1a]/5 dark:hover:bg-[#dd1c1a]/10
+                         text-gray-700 dark:text-gray-300"
+                >
+                  <Pencil class="h-4 w-4" />
+                  Rename
+                </button>
+                <button
+                  class="w-full px-3 py-2 text-sm text-left flex items-center gap-2
+                         hover:bg-[#dd1c1a]/5 dark:hover:bg-[#dd1c1a]/10
+                         text-gray-700 dark:text-gray-300"
+                >
+                  <Share class="h-4 w-4" />
+                  Share
+                </button>
+                <hr class="my-1 border-gray-200 dark:border-gray-700" />
+                <button
+                  class="w-full px-3 py-2 text-sm text-left flex items-center gap-2
+                         text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20"
+                  on:click={(e) => handleDelete(chat.id, e)}
+                >
+                  <Trash2 class="h-4 w-4" />
+                  Delete
+                </button>
+              </div>
+            {/if}
+          </div>
         </div>
       {/each}
     </div>

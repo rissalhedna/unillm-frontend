@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button/index.js';
 	import { Send } from 'lucide-svelte';
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
 
@@ -24,15 +23,12 @@
 		query = '';
 		answer.set('');
 
-		// Reset textarea height
 		if (textareaElement) {
 			textareaElement.style.height = '1.25rem';
 		}
 
-		// Add this line to scroll to bottom when loading starts
 		setTimeout(scrollToBottom, 0);
 
-		// If this is a new chat (no active chat), create it first
 		if (!$activeChat) {
 			console.log('🆕 Creating new chat with first message:', currentQuery);
 			try {
@@ -58,7 +54,6 @@
 			}
 		}
 
-		// Process the message
 		await chatMessages.set(currentQuery);
 	};
 
@@ -66,12 +61,10 @@
 		setTimeout(scrollToBottom, 0);
 	}
 
-	// Add this reactive statement to scroll when messages change
 	$: if ($chatMessages.messages.length > 0) {
 		setTimeout(scrollToBottom, 0);
 	}
 
-	// Add these arrays to your existing script section
 	const popularTopics = [
 		{
 			icon: "🏛️",
@@ -107,7 +100,6 @@
 </script>
 
 <div class="grid h-screen w-full bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] dark:from-gray-900 dark:to-gray-800 md:grid-cols-[17.5rem_1fr] relative overflow-hidden">
-	<!-- Sidebar - removed border-r -->
 	<div class="hidden bg-[#f8f9fa] dark:bg-gray-800/50 md:block h-screen overflow-hidden backdrop-blur-sm border-r border-[#dd1c1a]/10">
 		<div class="flex h-full flex-col">
 			<div class="flex h-14 items-center px-4 lg:h-[60px] lg:px-6 bg-[#dd1c1a]/5 dark:bg-gray-800/80">
@@ -119,14 +111,11 @@
 				<ChatHistory />
 			</div>
 			<div class="p-4">
-				<!-- Add new chat button here if needed -->
 			</div>
 		</div>
 	</div>
 
-	<!-- Main Content - updated background colors -->
 	<div class="flex h-screen flex-col bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm">
-		<!-- Header - removed border-b -->
 		<header class="flex h-14 items-center gap-4 bg-[#f8f9fa]/90 dark:bg-gray-800/90
 				   px-4 lg:h-[60px] lg:px-6 border-b border-[#dd1c1a]/10">
 		</header>
@@ -183,17 +172,14 @@
 						{/if}
 					</div>
 				</div>
-							<!-- Welcome message when no messages -->
 			{#if $chatMessages.messages.length === 0}
 			<div class="flex-1 justify-center items-center px-4 pt-12">
-				<!-- Welcome Header -->
 				<div class="text-center">
 					<div class="flex justify-center mb-6">
 						<div class="w-16 h-16 rounded-full shadow-lg bg-gray-50 dark:bg-gray-800
 									flex items-center justify-center
 									border-2 border-[#dd1c1a]/20">
 							{#if !import.meta.env.PROD}
-								<!-- Development fallback -->
 								<span class="text-4xl">🇩🇪</span>
 							{:else}
 								<img
@@ -212,7 +198,6 @@
 
 				<!-- Example Questions Grid -->
 				<div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
-					<!-- Popular Topics Column -->
 					<div class="space-y-4">
 						<h2 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
 							Popular Topics
@@ -270,7 +255,6 @@
 		{/if}
 			</div>
 
-			<!-- Fixed Input Form -->
 			<div>
 				<div class="max-w-5xl mx-auto px-4 pb-4">
 					<form
@@ -307,7 +291,7 @@
 								}}
 							/>
 
-							<Button
+							<button
 								type="submit"
 								class="absolute right-2 bottom-3
 									   p-2 rounded-full
@@ -316,11 +300,12 @@
 									   transform hover:scale-105
 									   transition-all duration-200
 									   disabled:hover:scale-100
-									   disabled:opacity-70"
+									   disabled:opacity-70
+									   flex items-center justify-center"
 								disabled={isLoading || !query.trim()}
 							>
 								<Send class="w-5 h-5" />
-							</Button>
+							</button>
 						</div>
 					</form>
 

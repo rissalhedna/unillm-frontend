@@ -1,5 +1,7 @@
 {
-	"/": [],
+	"/": [
+		"src/routes/+page.server.ts"
+	],
 	"/api/chats": [
 		"src/routes/api/chats/+server.ts"
 	],
@@ -8,5 +10,15 @@
 	],
 	"/api/chats/[id]/messages": [
 		"src/routes/api/chats/[id]/messages/+server.ts"
+	],
+	"/login": [],
+	"/login/google": [
+		"src/routes/login/google/+server.ts"
+	],
+	"/login/google/callback": [
+		"src/routes/login/google/callback/+server.ts"
+	],
+	"/logout": [
+		"src/routes/logout/+page.server.ts"
 	]
 }

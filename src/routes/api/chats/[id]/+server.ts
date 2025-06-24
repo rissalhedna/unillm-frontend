@@ -1,8 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '$lib/server/db';
 
 export const GET: RequestHandler = async ({ params }) => {
   const chat = await prisma.chat.findUnique({
