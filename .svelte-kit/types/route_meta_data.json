@@ -1,6 +1,8 @@
 {
 	"/": [
-		"src/routes/+page.server.ts"
+		"src/routes/+page.server.ts",
+		"src/routes/+layout.server.ts",
+		"src/routes/+layout.server.ts"
 	],
 	"/api/chats": [
 		"src/routes/api/chats/+server.ts"
@@ -11,14 +13,17 @@
 	"/api/chats/[id]/messages": [
 		"src/routes/api/chats/[id]/messages/+server.ts"
 	],
-	"/login": [],
+	"/api/logout": [
+		"src/routes/api/logout/+page.server.ts",
+		"src/routes/+layout.server.ts"
+	],
+	"/login": [
+		"src/routes/+layout.server.ts"
+	],
 	"/login/google": [
 		"src/routes/login/google/+server.ts"
 	],
 	"/login/google/callback": [
 		"src/routes/login/google/callback/+server.ts"
-	],
-	"/logout": [
-		"src/routes/logout/+page.server.ts"
 	]
 }

@@ -8,12 +8,12 @@ export const nodes = [
 	() => import('./nodes/4')
 ];
 
-export const server_loads = [];
+export const server_loads = [0];
 
 export const dictionary = {
 		"/": [~2],
-		"/login": [3],
-		"/logout": [~4]
+		"/api/logout": [~3],
+		"/login": [4]
 	};
 
 export const hooks = {
@@ -29,4 +29,4 @@ export const hash = false;
 
 export const decode = (type, value) => decoders[type](value);
 
-export { default as root } from '../root.svelte';
+export { default as root } from '../root.js';

@@ -12,8 +12,15 @@
 
   let classes = "";
   let scrollToDiv: HTMLDivElement;
+  let parsedMessage = "";
 
   $: normalizedType = (["user", "assistant", "system"].includes(type as string) ? type : "user") as MessageRole;
+
+  $: if (message) {
+    parseMessage(message).then(result => {
+      parsedMessage = result;
+    });
+  }
 
   const classSet = {
     user: "justify-end",
@@ -47,13 +54,11 @@
     });
   });
 
-  // Configure marked options for better formatting
   marked.setOptions({
     gfm: true, // GitHub Flavored Markdown
     breaks: true, // Convert \n to <br>
   });
 
-  // Function to parse message and format with superscript numbers
   function formatMessageWithSources(message: string) {
     let sourceCount = 0;
 
@@ -69,7 +74,12 @@
     return formattedMessage;
   }
 
-  $: formattedMessage = formatMessageWithSources(message);
+  async function parseMessage(message: string) {
+    const formattedMessage = formatMessageWithSources(message);
+    const parsedMessage = await marked.parse(formattedMessage);
+    return DOMPurify.sanitize(parsedMessage);
+  }
+
 </script>
 
 <div class="flex {classSet[normalizedType]}">
@@ -84,8 +94,9 @@
                   prose-code:px-1 prose-code:py-0.5 prose-code:bg-gray-100 prose-code:rounded
                   prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg
                   dark:prose-code:bg-gray-800 dark:prose-pre:bg-gray-800">
-        {@html DOMPurify.sanitize(marked.parse(formattedMessage).toString())}
+        {@html parsedMessage}
       </div>
   </div>
+  <!-- svelte-ignore element_invalid_self_closing_tag -->
   <div bind:this={scrollToDiv} />
 </div>

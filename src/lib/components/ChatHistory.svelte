@@ -1,16 +1,15 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import Ellipsis from "lucide-svelte/icons/ellipsis";
-  import { chatMessages } from "$lib/stores/chat-messages";
   import {
-    chatHistorySubscription,
-    loadMessages,
     deleteChat,
-    updateChatTitle,
     fetchChats,
-    activeChat
-  } from "$lib/stores/chat-history";
-  import { MessageSquare, Pencil, Plus, Trash2, Share } from "lucide-svelte";
+    loadMessages,
+    updateChatTitle,
+    resetMessages
+  } from "$lib/utils";
+  import { Ellipsis, MessageSquare, Pencil, Plus, Share, Trash2 } from "lucide-svelte";
+  import { onMount } from "svelte";
+
+  import { activeChat, chatHistorySubscription } from "$lib/state";
 
   interface Chat {
     id: string;
@@ -46,7 +45,7 @@
     event.stopPropagation();
     await deleteChat(chatId);
     if ($activeChat === chatId) {
-      chatMessages.reset();
+      resetMessages();
       activeChat.set(null);
     }
     openDropdownId = null;
@@ -67,7 +66,7 @@
   }
 
   function handleNewChat() {
-    chatMessages.reset();
+    resetMessages();
     activeChat.set(null);
   }
 

@@ -42,16 +42,16 @@ export async function validateSessionToken(token: string){
 	return {session: session, user: session.user}
 }
 
-export function invalidateSession(sessionId: string): void {
-	prisma.session.delete({
+export async function invalidateSession(sessionId: string): Promise<void> {
+	await prisma.session.delete({
 		where: {
 			id: sessionId
 		}
 	});
 }
 
-export function invalidateUserSessions(userId: string): void {
-	prisma.session.deleteMany({
+export async function invalidateUserSessions(userId: string): Promise<void> {
+	await prisma.session.deleteMany({
 		where: {
 			userId
 		}

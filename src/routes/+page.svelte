@@ -2,9 +2,9 @@
 	import { Send } from 'lucide-svelte';
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
 
-	import { chatMessages, answer } from '$lib/stores/chat-messages';
+	import { sendMessage, fetchChats } from '$lib/utils';
+	import { chatMessages, activeChat, answer, messageStream } from '$lib/state';
 	import ChatHistory from '$lib/components/ChatHistory.svelte';
-	import { activeChat, fetchChats } from '$lib/stores/chat-history';
 
 	let query = '';
 	let messagesContainer: HTMLDivElement;
@@ -54,7 +54,7 @@
 			}
 		}
 
-		await chatMessages.set(currentQuery);
+		await sendMessage(currentQuery);
 	};
 
 	$: if ($answer) {
@@ -99,74 +99,66 @@
 	}
 </script>
 
-<div class="grid h-screen w-full bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] dark:from-gray-900 dark:to-gray-800 md:grid-cols-[17.5rem_1fr] relative overflow-hidden">
-	<div class="hidden bg-[#f8f9fa] dark:bg-gray-800/50 md:block h-screen overflow-hidden backdrop-blur-sm border-r border-[#dd1c1a]/10">
+<div class="grid h-screen w-full bg-white md:grid-cols-[280px_1fr] relative overflow-hidden">
+	<div class="hidden bg-gray-50 md:block h-screen overflow-hidden border-r border-gray-200">
 		<div class="flex h-full flex-col">
-			<div class="flex h-14 items-center px-4 lg:h-[60px] lg:px-6 bg-[#dd1c1a]/5 dark:bg-gray-800/80">
-				<a href="/" class="flex items-center gap-2 font-semibold text-gray-800 dark:text-white">
+			<div class="flex h-16 items-center px-4 border-b border-gray-200">
+				<a href="/" class="flex items-center gap-2 font-semibold text-gray-900">
 					<span class="text-xl">UniLLM</span>
 				</a>
 			</div>
-			<div class="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+			<div class="flex-1 overflow-y-auto">
 				<ChatHistory />
-			</div>
-			<div class="p-4">
 			</div>
 		</div>
 	</div>
 
-	<div class="flex h-screen flex-col bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm">
-		<header class="flex h-14 items-center gap-4 bg-[#f8f9fa]/90 dark:bg-gray-800/90
-				   px-4 lg:h-[60px] lg:px-6 border-b border-[#dd1c1a]/10">
+	<div class="flex h-screen flex-col bg-white">
+		<header class="flex h-16 items-center gap-4 px-4 border-b border-gray-200">
+			<h1 class="text-lg font-medium text-gray-900">Chat with UniLLM</h1>
 		</header>
 
 		<!-- Main Chat Area -->
-		<main class="flex h-[calc(100vh-60px)] flex-1 flex-col relative">
+		<main class="flex h-[calc(100vh-64px)] flex-1 flex-col relative">
 
 			<!-- Scrollable Messages Container -->
 			<div
-				class="flex-1 overflow-y-auto scroll-smooth
-					   scrollbar scrollbar-w-3 scrollbar-track-transparent
-					   scrollbar-thumb-gray-300 scrollbar-thumb-rounded-lg"
+				class="flex-1 overflow-y-auto"
 				bind:this={messagesContainer}
 			>
-				<div class="max-w-5xl mx-auto px-4 py-6">
-					<div class="flex flex-col gap-4">
+				<div class="max-w-4xl mx-auto px-4 py-6">
+					<div class="flex flex-col gap-6">
 						{#each $chatMessages.messages as message}
 							<ChatMessage
 								type={message.role}
 								message={message.content}
-								class="px-4 py-3 rounded-lg
-									   {message.role === 'user' ?
-									   'bg-[#dd1c1a]/5 ml-auto max-w-[85%] md:max-w-[75%]' :
-									   'bg-gray-100 dark:bg-gray-800/50 mr-auto max-w-[85%] md:max-w-[75%]'}
-									   border border-[#dd1c1a]/10
-									   shadow-sm"
+								class="{message.role === 'user' ?
+								   'px-4 py-3 rounded-2xl bg-blue-600 text-white ml-auto max-w-[80%] shadow-sm' :
+								   'mr-auto max-w-[80%] text-gray-900'}"
 							/>
 						{/each}
+						{#if $messageStream}
+							<ChatMessage
+								type="assistant"
+								message={$messageStream}
+								class="mr-auto max-w-[80%] text-gray-900"
+							/>
+						{/if}
 
 						{#if $answer}
 							<ChatMessage
 								type="assistant"
 								message={$answer}
-								class="px-4 py-3 rounded-lg
-									   bg-gray-100 dark:bg-gray-800/50
-									   mr-auto max-w-[85%] md:max-w-[75%]
-									   border border-[#dd1c1a]/10
-									   shadow-sm"
+								class="mr-auto max-w-[80%] text-gray-900"
 							/>
 						{/if}
 
 						{#if isLoading}
-							<div class="px-4 py-3 rounded-lg
-									  bg-gray-100 dark:bg-gray-800/50
-									  mr-auto max-w-[85%] md:max-w-[75%]
-									  border border-[#dd1c1a]/10
-									  shadow-sm">
+							<div class="mr-auto max-w-[80%]">
 								<div class="flex gap-1">
-									<span class="w-1 h-1 rounded-full bg-black animate-bounce [animation-delay:-0.3s]"></span>
-									<span class="w-1 h-1 rounded-full bg-black animate-bounce [animation-delay:-0.15s]"></span>
-									<span class="w-1 h-1 rounded-full bg-black animate-bounce"></span>
+									<span class="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.3s]"></span>
+									<span class="w-2 h-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.15s]"></span>
+									<span class="w-2 h-2 rounded-full bg-gray-400 animate-bounce"></span>
 								</div>
 							</div>
 						{/if}
@@ -176,9 +168,9 @@
 			<div class="flex-1 justify-center items-center px-4 pt-12">
 				<div class="text-center">
 					<div class="flex justify-center mb-6">
-						<div class="w-16 h-16 rounded-full shadow-lg bg-gray-50 dark:bg-gray-800
+						<div class="w-16 h-16 rounded-full shadow-lg bg-blue-100
 									flex items-center justify-center
-									border-2 border-[#dd1c1a]/20">
+									border border-blue-200">
 							{#if !import.meta.env.PROD}
 								<span class="text-4xl">🇩🇪</span>
 							{:else}
@@ -191,32 +183,30 @@
 							{/if}
 						</div>
 					</div>
-					<h1 class="text-4xl font-bold mb-20 text-gray-800 dark:text-white">
+					<h1 class="text-3xl font-bold mb-16 text-gray-900">
 						Ask me anything about Germany!
 					</h1>
 				</div>
 
 				<!-- Example Questions Grid -->
-				<div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
+				<div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
 					<div class="space-y-4">
-						<h2 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+						<h2 class="text-sm font-semibold text-gray-700 mb-3">
 							Popular Topics
 						</h2>
-						<div class="flex flex-col gap-4">
+						<div class="flex flex-col gap-3">
 							{#each popularTopics as {icon, title, query: topicQuery}}
 								<button
-									class="w-full text-left p-4 rounded-xl bg-gray-50 hover:bg-[#dd1c1a]/5
-										   dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors
-										   border border-[#dd1c1a]/10 hover:border-[#dd1c1a]/20
-										   flex items-center gap-3 group"
+									class="w-full text-left p-4 rounded-xl bg-white hover:bg-gray-50
+										   border border-gray-200 hover:border-gray-300 transition-all
+										   flex items-center gap-3 group shadow-sm hover:shadow-md"
 									on:click={() => {
 										query = topicQuery;
 										handleSubmit();
 									}}
 								>
 									<span class="text-2xl">{icon}</span>
-									<span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900
-											   dark:group-hover:text-white transition-colors">
+									<span class="text-sm text-gray-800 group-hover:text-gray-900 transition-colors font-medium">
 										{title}
 									</span>
 								</button>
@@ -226,24 +216,22 @@
 
 					<!-- Getting Started Column -->
 					<div class="space-y-4">
-						<h2 class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+						<h2 class="text-sm font-semibold text-gray-700 mb-3">
 							Getting Started
 						</h2>
-						<div class="flex flex-col gap-4">
+						<div class="flex flex-col gap-3">
 							{#each gettingStarted as {icon, title, query: topicQuery}}
 								<button
-									class="w-full text-left p-4 rounded-xl bg-gray-50 hover:bg-[#dd1c1a]/5
-										   dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors
-										   border border-[#dd1c1a]/10 hover:border-[#dd1c1a]/20
-										   flex items-center gap-3 group"
+									class="w-full text-left p-4 rounded-xl bg-white hover:bg-gray-50
+										   border border-gray-200 hover:border-gray-300 transition-all
+										   flex items-center gap-3 group shadow-sm hover:shadow-md"
 									on:click={() => {
 										query = topicQuery;
 										handleSubmit();
 									}}
 								>
 									<span class="text-2xl">{icon}</span>
-									<span class="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900
-											   dark:group-hover:text-white transition-colors">
+									<span class="text-sm text-gray-800 group-hover:text-gray-900 transition-colors font-medium">
 										{title}
 									</span>
 								</button>
@@ -256,72 +244,86 @@
 			</div>
 
 			<div>
-				<div class="max-w-5xl mx-auto px-4 pb-4">
+				<div class="max-w-4xl mx-auto px-4 pb-6">
 					<form
 						class="flex justify-center items-end gap-4 relative"
 						on:submit|preventDefault={handleSubmit}
 					>
-						<div class="relative w-full max-w-2xl">
-							<textarea
-								bind:this={textareaElement}
-								bind:value={query}
-								class="w-full min-h-[7rem] max-h-[12.5rem] py-4 px-5
-									   rounded-2xl border-2 border-[#dd1c1a]/20
-									   focus:border-[#dd1c1a]/30 focus:outline-none
-									   bg-gray-100 dark:bg-gray-800
-									   text-gray-800 dark:text-white
-									   placeholder:text-gray-400 dark:placeholder:text-gray-400
-									   text-sm leading-normal
-									   resize-none overflow-y-auto
-									   scrollbar-none"
-								placeholder="Message UniLLM..."
-								disabled={isLoading}
-								rows="1"
-								on:keydown={(e) => {
-									if (e.key === 'Enter' && !e.shiftKey) {
-										e.preventDefault();
-										handleSubmit();
-									}
-								}}
-								on:input={(e) => {
-									if(e && e.target && e.target instanceof HTMLTextAreaElement){
-										e.target.style.height = 'auto';
-										e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
-									}
-								}}
-							/>
+						<div class="relative w-full max-w-4xl">
+							<div class="flex items-center bg-gray-100 rounded-3xl border border-gray-200 shadow-sm">
+								<div class="relative group">
+									<button
+										type="button"
+										class="flex items-center gap-1.5 pl-4 pr-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200/60 rounded-l-3xl transition-all duration-200"
+									>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+											<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+										</svg>
+										<span class="text-sm font-medium select-none">Tools</span>
+									</button>
+									
+									<!-- Tooltip -->
+									<div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+										Coming soon
+										<div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-gray-900"></div>
+									</div>
+								</div>
+								
+								<!-- Divider line -->
+								<div class="w-px h-6 bg-gray-300 mx-1"></div>
+								
+								<textarea
+									bind:this={textareaElement}
+									bind:value={query}
+									class="flex-1 min-h-[48px] max-h-[200px] py-3 px-3
+										   bg-transparent text-gray-900
+										   placeholder:text-gray-500
+										   text-base leading-6
+										   resize-none overflow-y-auto
+										   border-none outline-none focus:outline-none"
+									placeholder="Ask anything"
+									disabled={isLoading}
+									rows="1"
+									on:keydown={(e) => {
+										if (e.key === 'Enter' && !e.shiftKey) {
+											e.preventDefault();
+											handleSubmit();
+										}
+									}}
+									on:input={(e) => {
+										if(e && e.target && e.target instanceof HTMLTextAreaElement){
+											e.target.style.height = 'auto';
+											e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+										}
+									}}
+								/>
 
-							<button
-								type="submit"
-								class="absolute right-2 bottom-3
-									   p-2 rounded-full
-									   bg-[#dd1c1a] hover:bg-[#dd1c1a]/90
-									   text-white disabled:bg-gray-400
-									   transform hover:scale-105
-									   transition-all duration-200
-									   disabled:hover:scale-100
-									   disabled:opacity-70
-									   flex items-center justify-center"
-								disabled={isLoading || !query.trim()}
-							>
-								<Send class="w-5 h-5" />
-							</button>
+								<div class="flex items-center pr-2">
+									<button
+										type="submit"
+										class="p-2 rounded-full
+											   bg-gray-800 hover:bg-gray-900
+											   text-white disabled:bg-gray-300
+											   transition-colors duration-200
+											   disabled:cursor-not-allowed
+											   flex items-center justify-center
+											   w-8 h-8"
+										disabled={isLoading || !query.trim()}
+									>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path>
+										</svg>
+									</button>
+								</div>
+							</div>
 						</div>
 					</form>
 
-					<div class="flex items-center justify-center gap-2 mt-5 max-w-2xl mx-auto">
-						<p class="text-xs text-[#666666] dark:text-gray-400">
+					<div class="flex items-center justify-center gap-1 mt-3 max-w-4xl mx-auto">
+						<p class="text-xs text-gray-500 text-center">
 							UniLLM can make mistakes. Consider checking important information.
 						</p>
-						{#if !isLoading && $chatMessages.messages.length > 0}
-							<button
-								class="text-xs text-[#dd1c1a] hover:text-[#dd1c1a]/80 dark:text-[#dd1c1a]/90
-									   hover:underline transition-colors duration-200"
-								on:click={() => {/* Add regenerate functionality */}}
-							>
-								Regenerate response
-							</button>
-						{/if}
 					</div>
 				</div>
 			</div>
