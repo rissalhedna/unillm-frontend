@@ -7,6 +7,7 @@ import {
 	type ChatTranscript,
     messageStream
 } from '$lib/state';
+import { SOURCE_DELIMITER } from './constants';
 
 export const sendMessage = async (query: string) => {
 	console.log('📝 Processing new message:', query);
@@ -52,13 +53,16 @@ export const sendMessage = async (query: string) => {
 		if (!response.body) {
 			throw new Error('No response body received');
 		}
-        let sources: string[] = [];
+        const sourceURLs: string[] = [];
 		const reader = response.body.getReader();
-		// TODO: Implement proper streaming response handling            
 		async function processStream() {
 			reader.read().then(async ({ done, value }) => {
 				if (done) {
 					console.log("Stream completed");
+                    for(const sourceURL of sourceURLs){
+						console.log("Source: ", sourceURL)
+                        messageStream.set(get(messageStream) + SOURCE_DELIMITER + sourceURL + SOURCE_DELIMITER)
+                    }
 					chatMessages.update((messages: ChatTranscript) => ({
 						messages: [...messages.messages, { role: 'assistant', content: get(messageStream) }],
 						chatState: 'idle' as const
@@ -80,7 +84,30 @@ export const sendMessage = async (query: string) => {
                     })
                     messageStream.set(get(messageStream) + textChunk)
                 }else{
-                    sources.push(textChunk.split('source:')[1])
+					const sourceString = textChunk.split('source:')[1]
+					if(sourceString && sourceString.trim() !== ''){
+						console.log("Source URL: ",sourceString)
+						try {
+							// Convert Python dict format to JSON by replacing single quotes with double quotes
+							const jsonString = sourceString
+								.replace(/'/g, '"')  // Replace single quotes with double quotes
+								.trim();
+							
+							const parsedSource = JSON.parse(jsonString);
+							console.log('✅ Parsed source:', parsedSource);
+							sourceURLs.push(parsedSource.url);
+						} catch (parseError) {
+							console.error('❌ JSON parse error:', parseError);
+							console.error('❌ Raw source string:', sourceString);
+							
+							// Fallback: try to extract URL with regex if JSON parsing fails
+							const urlMatch = sourceString.match(/'url':\s*'([^']+)'/);
+							if (urlMatch && urlMatch[1]) {
+								console.log('🔧 Using regex extracted URL:', urlMatch[1]);
+								sourceURLs.push(urlMatch[1]);
+							}
+						}
+					}
                 }
 				await processStream();
 			});

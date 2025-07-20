@@ -68,14 +68,14 @@ npm install
 
 ```env
 # Database
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
-DIRECT_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres"
+DIRECT_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres"
 
 # Backend API
-VITE_API_URL="http://localhost:8000"
+VITE_API_URL="http://127.0.0.1:8000"
 
 # Qdrant (if needed for direct access)
-QDRANT_URL="http://localhost:6333"
+QDRANT_URL="http://127.0.0.1:6333"
 ```
 
 4. Generate Prisma client and run migrations:
@@ -96,7 +96,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://127.0.0.1:5173`
 
 ### Development Scripts
 

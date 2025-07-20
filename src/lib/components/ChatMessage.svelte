@@ -29,7 +29,7 @@
   };
 
   const messageClasses = {
-    user: "bg-gray-100 text-[#333333]",
+    user: "bg-blue-500 text-white",
     assistant: "text-[#333333]",
     system: "bg-gray-100 text-[#666666]",
   };
@@ -77,7 +77,7 @@
   async function parseMessage(message: string) {
     const formattedMessage = formatMessageWithSources(message);
     const parsedMessage = await marked.parse(formattedMessage);
-    return DOMPurify.sanitize(parsedMessage);
+    return parsedMessage;
   }
 
 </script>
